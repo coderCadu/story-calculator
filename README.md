@@ -40,6 +40,8 @@ A página foi construída com base na tela do projeto Stitch MCP `18046564442301
 - CTA com gradiente de `primary` para `primary-dim`
 - Tipografia Inter com títulos grandes e contraste alto
 
+<img width="3334" height="1798" alt="image" src="https://github.com/user-attachments/assets/3ed377db-e375-4323-81a8-6549030a4a41" />
+
 ## Estrutura
 
 - `index.html`: página principal
