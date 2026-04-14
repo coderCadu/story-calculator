@@ -4,10 +4,11 @@ import { calculateSprintValueAdapter } from "./src/index.js";
 const DEFAULT_FORM = Object.freeze({
   developers: 1,
   developmentHoursPerDay: 6,
+  sprintDurationDays: 10,
+  hasRnf: false,
   storyPoints: 0,
-  pointValue: 0,
+  pointValue: 4,
   technicalRefinementHours: 26,
-  rnfDeveloperCount: 1,
 });
 
 createApp({
@@ -29,14 +30,44 @@ createApp({
           label: "RNF",
           value: "30%",
         },
-        {
-          label: "RNF devs",
-          value: this.form.rnfDeveloperCount,
-        },
       ];
     },
     resultMetrics() {
-      return this.lastResult ? Object.values(this.lastResult.data.output) : [];
+      if (!this.lastResult) return [];
+      
+      const metrics = Object.values(this.lastResult.data.output);
+      
+      return metrics.map(metric => {
+        const label = metric.label || '';
+        
+        let category = 'capacity';
+        if (label.includes('história') || label.includes('Refinamento') || label.includes('necessários')) {
+          category = 'story';
+        } else if (label.includes('RNF') && !label.includes('percentual')) {
+          category = 'rnf';
+        } else if (label.includes('Cabe no sprint') || label.includes('Dias restantes') || label.includes('Duração do sprint')) {
+          category = 'story';
+        }
+        
+        return {
+          ...metric,
+          category,
+          isRnfRelated: label.includes('RNF'),
+          isAllocated: label.includes('alocados'),
+        };
+      });
+    },
+    capacityMetrics() {
+      return this.resultMetrics.filter(m => m.category === 'capacity' && !m.isRnfRelated);
+    },
+    storyMetrics() {
+      return this.resultMetrics.filter(m => m.category === 'story');
+    },
+    rnfMetrics() {
+      return this.resultMetrics.filter(m => m.isRnfRelated);
+    },
+    hasRnfMetrics() {
+      return this.rnfMetrics.length > 0;
     },
     hasResult() {
       return Boolean(this.lastResult);
@@ -50,13 +81,14 @@ createApp({
       const payload = {
         developers: Number(this.form.developers),
         developmentHoursPerDay: Number(this.form.developmentHoursPerDay),
+        sprintDurationDays: Number(this.form.sprintDurationDays),
+        hasRnf: Boolean(this.form.hasRnf),
         storyPoints: Number(this.form.storyPoints),
         pointValue: Number(this.form.pointValue),
       };
 
       const policy = {
         technicalRefinementHours: Number(this.form.technicalRefinementHours),
-        rnfDeveloperCount: Number(this.form.rnfDeveloperCount),
       };
 
       const result = calculateSprintValueAdapter(payload, policy);
@@ -111,35 +143,48 @@ createApp({
           </div>
 
           <form class="calculator-form" novalidate @submit.prevent="calculate">
-            <label>
-              <span>Quantidade de desenvolvedores</span>
-              <input v-model.number="form.developers" type="number" min="1" step="1" />
-            </label>
+            <div class="form-section">
+              <h3>Sprint Setup</h3>
+              
+              <label>
+                <span>Quantidade de desenvolvedores</span>
+                <input v-model.number="form.developers" type="number" min="1" step="1" />
+              </label>
 
-            <label>
-              <span>Horas de desenvolvimento por dia</span>
-              <input v-model.number="form.developmentHoursPerDay" type="number" min="1" step="1" />
-            </label>
+              <label>
+                <span>Horas de desenvolvimento por dia</span>
+                <input v-model.number="form.developmentHoursPerDay" type="number" min="1" step="1" />
+              </label>
 
-            <label>
-              <span>Pontos totais da história</span>
-              <input v-model.number="form.storyPoints" type="number" min="1" step="1" />
-            </label>
+              <label>
+                <span>Duração da sprint (dias)</span>
+                <input v-model.number="form.sprintDurationDays" type="number" min="1" step="1" />
+              </label>
 
-            <label>
-              <span>Valor de cada ponto</span>
-              <input v-model.number="form.pointValue" type="number" min="1" step="1" />
-            </label>
+              <label class="checkbox-label">
+                <input v-model="form.hasRnf" type="checkbox" />
+                <span>Incluir RNF</span>
+              </label>
+            </div>
 
-            <label>
-              <span>Refinamento técnico (horas)</span>
-              <input v-model.number="form.technicalRefinementHours" type="number" min="1" step="1" />
-            </label>
+            <div class="form-section">
+              <h3>Story Sizing</h3>
+              
+              <label>
+                <span>Pontos totais da história</span>
+                <input v-model.number="form.storyPoints" type="number" min="1" step="1" />
+              </label>
 
-            <label>
-              <span>Desenvolvedores no RNF</span>
-              <input v-model.number="form.rnfDeveloperCount" type="number" min="1" step="1" />
-            </label>
+              <label>
+                <span>Valor de cada ponto</span>
+                <input v-model.number="form.pointValue" type="number" min="1" step="1" />
+              </label>
+
+              <label>
+                <span>Refinamento técnico (horas)</span>
+                <input v-model.number="form.technicalRefinementHours" type="number" min="1" step="1" />
+              </label>
+            </div>
 
             <div class="form-actions">
               <button type="submit" class="primary-button">Calcular sprint</button>
@@ -153,20 +198,51 @@ createApp({
         <section class="card results-card">
           <div class="section-heading">
             <p class="eyebrow">Resultado</p>
-            <h2>Valores calculados</h2>
+            <h2>Dashboard integrado</h2>
           </div>
 
           <div v-if="!hasResult" class="empty-state">
             <p>Preencha os campos e execute o cálculo para visualizar os valores intermediários e finais.</p>
           </div>
 
-          <div v-else class="results-grid">
-            <article class="result-card" v-for="metric in resultMetrics" :key="metric.label">
-              <div class="title">{{ metric.label }}</div>
-              <div class="value">{{ formatMetricValue(metric) }}</div>
-              <div class="formula">Fórmula: {{ metric.formula }}</div>
-              <div v-if="formatRawValue(metric)" class="raw">{{ formatRawValue(metric) }}</div>
-            </article>
+          <div v-else class="results-dashboard">
+            <div class="dashboard-section">
+              <h3>Sprint Capacity</h3>
+              <div class="results-grid">
+                <article class="result-card" v-for="metric in capacityMetrics" :key="metric.label">
+                  <div class="title">{{ metric.label }}</div>
+                  <div class="value">{{ formatMetricValue(metric) }}</div>
+                  <div class="formula">Fórmula: {{ metric.formula }}</div>
+                  <div v-if="formatRawValue(metric)" class="raw">{{ formatRawValue(metric) }}</div>
+                </article>
+              </div>
+            </div>
+
+            <div class="dashboard-section">
+              <h3>Story Analysis</h3>
+              <div class="results-grid">
+                <article class="result-card" v-for="metric in storyMetrics" :key="metric.label">
+                  <div class="title">{{ metric.label }}</div>
+                  <div class="value">{{ formatMetricValue(metric) }}</div>
+                  <div class="formula">Fórmula: {{ metric.formula }}</div>
+                  <div v-if="formatRawValue(metric)" class="raw">{{ formatRawValue(metric) }}</div>
+                </article>
+              </div>
+            </div>
+
+            <div class="dashboard-section" v-if="hasRnfMetrics">
+              <h3>RNF Allocation</h3>
+              <div class="results-grid">
+                <article class="result-card" v-for="metric in rnfMetrics" :key="metric.label">
+                  <div class="title">{{ metric.label }}</div>
+                  <div class="value">
+                    <span v-if="metric.isAllocated">🔒 </span>{{ formatMetricValue(metric) }}
+                  </div>
+                  <div class="formula">Fórmula: {{ metric.formula }}</div>
+                  <div v-if="formatRawValue(metric)" class="raw">{{ formatRawValue(metric) }}</div>
+                </article>
+              </div>
+            </div>
           </div>
         </section>
       </main>

@@ -1,5 +1,5 @@
 import { DEFAULT_CALCULATION_POLICY } from "../../domain/policies/calculationPolicy.js";
-import { calculateSprintValueDomain } from "../../domain/services/sprintValueCalculator.js";
+import { calculateSprintMetrics } from "../../domain/services/sprintMetricsCalculator.js";
 import {
   createOutputContract,
   createValidationError,
@@ -25,7 +25,7 @@ export function calculateSprintValueUseCase(
     };
   }
 
-  const values = calculateSprintValueDomain(input, effectivePolicy);
+  const values = calculateSprintMetrics(input, effectivePolicy);
 
   return {
     ok: true,
