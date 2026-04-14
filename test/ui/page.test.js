@@ -133,3 +133,47 @@ test("ui markup: RNF allocated devs shows lock indicator", () => {
     /v-if="metric\.isAllocated">🔒 <\/span>/,
   );
 });
+
+test("ui markup: checkbox has Material Design styling with .checkbox-label class", () => {
+  const app = fs.readFileSync(path.join(process.cwd(), "app.js"), "utf8");
+  const css = fs.readFileSync(path.join(process.cwd(), "styles.css"), "utf8");
+
+  // Check checkbox is wrapped in .checkbox-label
+  assert.match(app, /<label class="checkbox-label">/);
+  
+  // Check CSS has checkbox styling
+  assert.match(css, /\.checkbox-label/);
+  assert.match(css, /\.checkbox-label input\[type="checkbox"\]/);
+  
+  // Verify Material Design features: rounded borders, transitions, states
+  assert.match(css, /border-radius:\s*var\(--radius-\w+\)/);
+  assert.match(css, /transition:/);
+});
+
+test("ui markup: checkbox label is properly associated with input", () => {
+  const app = fs.readFileSync(path.join(process.cwd(), "app.js"), "utf8");
+
+  // Check checkbox and label are in same label element
+  assert.match(app, /<label class="checkbox-label">[\s\S]*?<input[^>]*type="checkbox"[^>]*>[\s\S]*?<span>Incluir RNF<\/span>[\s\S]*?<\/label>/);
+});
+
+test("ui contract: baseStoryEffort calculation is correct", () => {
+  const result = calculateSprintValueAdapter(
+    {
+      developers: 5,
+      developmentHoursPerDay: 8,
+      sprintDurationDays: 10,
+      hasRnf: false,
+      storyPoints: 13,
+      pointValue: 5,
+    },
+    { technicalRefinementHours: 10 },
+  );
+
+  assert.equal(result.ok, true);
+  
+  // Verify baseStoryEffort equals storyPoints × pointValue
+  assert.equal(result.data.output.baseStoryEffort.value, 65); // 13 × 5
+  assert.equal(result.data.output.baseStoryEffort.label, "Esforço base da história");
+  assert.equal(result.data.output.baseStoryEffort.formula, "storyPoints * pointValue");
+});

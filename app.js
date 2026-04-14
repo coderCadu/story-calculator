@@ -41,12 +41,18 @@ createApp({
         const label = metric.label || '';
         
         let category = 'capacity';
-        if (label.includes('história') || label.includes('Refinamento') || label.includes('necessários')) {
+        
+        // Esforço base e refinamento técnico ficam em capacity
+        if (label === 'Esforço base da história' || label.includes('Refinamento técnico') || label === 'Com refinamento técnico') {
+          category = 'capacity';
+        }
+        // Métricas de análise da sprint ficam em story
+        else if (label.includes('necessários') || label.includes('Cabe no sprint') || label.includes('Dias restantes') || label.includes('Duração do sprint')) {
           category = 'story';
-        } else if (label.includes('RNF') && !label.includes('percentual')) {
+        }
+        // RNF tem categoria própria
+        else if (label.includes('RNF') && !label.includes('percentual')) {
           category = 'rnf';
-        } else if (label.includes('Cabe no sprint') || label.includes('Dias restantes') || label.includes('Duração do sprint')) {
-          category = 'story';
         }
         
         return {
@@ -58,10 +64,54 @@ createApp({
       });
     },
     capacityMetrics() {
-      return this.resultMetrics.filter(m => m.category === 'capacity' && !m.isRnfRelated);
+      const metrics = this.resultMetrics.filter(m => m.category === 'capacity' && !m.isRnfRelated);
+      
+      // Define ordem lógica para métricas de capacidade
+      const order = [
+        'Capacidade total do sprint',
+        'Capacidade diária total',
+        'Devs funcionais',
+        'Capacidade funcional do sprint',
+        'Capacidade diária funcional',
+        'Esforço base da história',
+        'Refinamento técnico',
+        'Com refinamento técnico'
+      ];
+      
+      return metrics.sort((a, b) => {
+        const indexA = order.indexOf(a.label);
+        const indexB = order.indexOf(b.label);
+        
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        
+        return indexA - indexB;
+      });
     },
     storyMetrics() {
-      return this.resultMetrics.filter(m => m.category === 'story');
+      const metrics = this.resultMetrics.filter(m => m.category === 'story');
+      
+      // Define ordem lógica para métricas de história
+      const order = [
+        'Esforço base da história',
+        'Refinamento técnico',
+        'Com refinamento técnico',
+        'Número de dias necessários',
+        'Duração do sprint (dias)',
+        'Cabe no sprint',
+        'Dias restantes'
+      ];
+      
+      return metrics.sort((a, b) => {
+        const indexA = order.indexOf(a.label);
+        const indexB = order.indexOf(b.label);
+        
+        // Se não estiver na lista, deixa no final
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        
+        return indexA - indexB;
+      });
     },
     rnfMetrics() {
       return this.resultMetrics.filter(m => m.isRnfRelated);
