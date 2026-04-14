@@ -160,7 +160,7 @@ export function createOutputContract(input, policy, values) {
       },
       rnfHours: {
         label: OUTPUT_LABELS.rnfHours,
-        formula: "refinedStoryEffort * rnfPercentage (nearest integer)",
+        formula: "dailyCapacity * rnfPercentage (nearest integer)",
         raw: values.rawRnfHours,
         value: values.roundedRnfHours,
       },

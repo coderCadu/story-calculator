@@ -21,11 +21,11 @@ test("domain calculator applies all formulas and rounding policies", () => {
   assert.equal(result.refinedStoryEffort, 246);
   assert.equal(result.rawRequiredDays, 5.85);
   assert.equal(result.roundedRequiredDays, 6);
-  assert.equal(result.rawRnfHours, 73.8);
-  assert.equal(result.roundedRnfHours, 74);
+  assert.equal(result.rawRnfHours, 12.6);
+  assert.equal(result.roundedRnfHours, 13);
   assert.equal(result.rnfDailyCapacity, 12);
-  assert.equal(result.rawRnfDays, 6.16);
-  assert.equal(result.roundedRnfDays, 6);
+  assert.equal(result.rawRnfDays, 1.08);
+  assert.equal(result.roundedRnfDays, 1);
 });
 
 test("domain calculator skips RNF days when rnfDeveloperCount is zero", () => {

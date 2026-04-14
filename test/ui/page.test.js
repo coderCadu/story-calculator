@@ -18,7 +18,7 @@ test("ui contract: adapter returns result metadata for the Vue page", () => {
 
   assert.equal(result.ok, true);
   assert.equal(result.data.output.dailyCapacity.label, "Capacidade diaria");
-  assert.equal(result.data.output.rnfHours.value, 74);
+  assert.equal(result.data.output.rnfHours.value, 13);
 });
 
 test("ui markup: page shell includes Vue and Stitch-aligned sections", () => {

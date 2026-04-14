@@ -17,7 +17,7 @@ export function calculateSprintValueDomain(
   const roundedRequiredDays = Math.ceil(rawRequiredDays);
 
   const rawRnfHours = truncateToTwoDecimals(
-    refinedStoryEffort * policy.rnfPercentage,
+    dailyCapacity * policy.rnfPercentage,
   );
   const roundedRnfHours = Math.round(rawRnfHours);
 
