@@ -4,14 +4,21 @@ Aplicação web para calcular valor de sprint com base na calculadora já existe
 
 ## Como executar
 
-1. Instale dependências do Node.js com `npm install`
-2. Inicie o servidor local:
+1. Use o nvm para instalar a versão correta do Node.js:
+    - Instale o nvm seguindo as instruções em [https://github.com/nvm-sh/nvm](https://github.com/nvm-sh/nvm)
+    - Quando existir um arquivo `.nvmrc` no projeto, ao utilizar o comando abaixo o nvm irá automaticamente instalar e usar a versão correta do Node.js especificada no arquivo
+
+```bash
+nvm use
+```
+2. Instale dependências do Node.js com `npm install`
+3. Inicie o servidor local:
 
 ```bash
 npm run dev
 ```
 
-3. Abra `http://localhost:3000` no navegador.
+4. Abra `http://localhost:3000` no navegador.
 
 Campos da página:
 
