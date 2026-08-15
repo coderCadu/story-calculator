@@ -31,9 +31,24 @@ Campos da página:
 
 ## Testes
 
+Testes unitários e de arquitetura (`node --test`):
+
 ```bash
 npm test
 ```
+
+Testes end-to-end (funcionais e de regressão visual, via Playwright): sobem `server.js`, abrem a página num Chromium headless, preenchem o formulário e conferem os valores calculados, além de comparar screenshots com os baselines em `e2e/app.spec.js-snapshots/`.
+
+```bash
+npx playwright install --with-deps chromium   # primeira vez
+npm run test:e2e
+```
+
+Ao alterar a UI intencionalmente, atualize os baselines com `npm run test:e2e -- --update-snapshots` e faça a geração preferencialmente dentro da mesma imagem usada no CI (`mcr.microsoft.com/playwright:v1.62.1-noble`), para evitar diffs por diferença de renderização de fontes entre sistemas operacionais.
+
+## Integração contínua
+
+O workflow `.github/workflows/ci.yml` roda em push/PR e tem dois jobs: `unit-tests` (`npm test`) e `e2e-tests` (Playwright, dentro do container oficial do Playwright para bater com os screenshots de referência). Em falha dos testes E2E, o relatório HTML e os artefatos de diff ficam disponíveis como artifact do workflow.
 
 ## Direção visual Stitch
 

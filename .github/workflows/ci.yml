@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit-tests:
+    name: Testes unitários
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Node 24 (codename Krypton), mesma versão fixada em .nvmrc
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+
+  e2e-tests:
+    name: Testes E2E (funcionais e visuais)
+    runs-on: ubuntu-latest
+    # Roda dentro da imagem oficial do Playwright para garantir que a
+    # renderização (fontes/antialiasing) bata com os screenshots de
+    # referência commitados em e2e/app.spec.js-snapshots/. Ao atualizar
+    # a versão de @playwright/test em package.json, atualize esta tag junto.
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Rodar testes Playwright
+        run: npx playwright test
+
+      - name: Publicar relatório em caso de falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
