@@ -55,7 +55,12 @@ A página foi construída com base na tela do projeto Stitch MCP `18046564442301
 - `styles.css`: tokens visuais e layout responsivo
 - `app.js`: aplicação Vue e renderização dos resultados
 - `server.js`: servidor HTTP local para preview
+- `vendor/`: build de produção do Vue 3 servida como asset estático
 
 ## Dependência de UI
 
-A interface usa Vue 3 carregado localmente a partir de `node_modules`, sem exigir um pipeline de build adicional.
+A interface usa Vue 3 carregado a partir de `vendor/vue.esm-browser.prod.js` (commitado no repositório), sem exigir um pipeline de build adicional. O arquivo espelha a versão do Vue declarada em `package.json`; ao atualizar a dependência, copie novamente `node_modules/vue/dist/vue.esm-browser.prod.js` para `vendor/`.
+
+## Deploy na Vercel
+
+O projeto é um site estático (`index.html`, `app.js`, `styles.css`, `vendor/`). O `vercel.json` na raiz já configura o deploy sem build step. Basta importar o repositório na Vercel — nenhuma variável de ambiente ou configuração adicional é necessária.

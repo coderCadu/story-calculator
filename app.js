@@ -1,4 +1,4 @@
-import { createApp } from "/node_modules/vue/dist/vue.esm-browser.prod.js";
+import { createApp } from "/vendor/vue.esm-browser.prod.js";
 import { calculateSprintValueAdapter } from "./src/index.js";
 
 const DEFAULT_FORM = Object.freeze({
