@@ -58,7 +58,7 @@ A página foi construída com base na tela do projeto Stitch MCP `18046564442301
 
 ## Dependência de UI
 
-A interface usa Vue 3 carregado via CDN (jsDelivr), fixado na versão declarada em `package.json` (`3.5.32`), sem exigir um pipeline de build adicional. Ao atualizar a dependência do Vue, atualize também a versão fixada na URL de import em `app.js`.
+A interface usa Vue 3 carregado via CDN (jsDelivr), fixado em `3.5.32` (consulte `package.json` para a referência da dependência), sem exigir um pipeline de build adicional. Ao atualizar o Vue, atualize também a versão fixada na URL de import em `app.js` (e, se necessário, em `package.json`).
 
 ## Deploy na Vercel
 
