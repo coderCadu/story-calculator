@@ -70,6 +70,7 @@ A página foi construída com base na tela do projeto Stitch MCP `18046564442301
 - `styles.css`: tokens visuais e layout responsivo
 - `app.js`: aplicação Vue e renderização dos resultados
 - `server.js`: servidor HTTP local para preview
+- `favicon.svg` / `favicon.ico`: ícone da aba (SVG moderno + fallback ICO), mesmo gradiente `135deg #c59aff → #934eeb` da CTA
 
 ## Dependência de UI
 
