@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node --test",
+    "test:e2e": "playwright test",
     "dev": "node server.js"
   },
   "keywords": [],
@@ -13,5 +14,8 @@
   "type": "module",
   "dependencies": {
     "vue": "^3.5.32"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
   }
 }
